@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <title>SteemBotCompare</title>
-  <meta name="generator" content="Google Web Designer 2.0.3.0109">
+  <meta name="generator" content="Google Web Designer 2.0.4.0112">
   <style type="text/css" id="gwd-text-style">
     p {
       margin: 0px;
@@ -147,8 +147,8 @@
       white-space: nowrap;
       top: 16px;
       left: 156px;
-      width: 500px;
       height: 440px;
+      width: 600px;
     }
     .gwd-div-824v {
       position: absolute;
@@ -163,8 +163,8 @@
       border-width: 0px;
       width: 150px;
       top: 16px;
-      left: 840px;
       height: 440px;
+      left: 940px;
     }
     .gwd-sub-5dj0 {
       position: absolute;
@@ -182,7 +182,7 @@
       left: 206px;
       top: 178px;
       text-align: left;
-      width: 500px;
+      width: 600px;
     }
     .gwd-p-9kqp {
       position: absolute;
@@ -190,7 +190,7 @@
       width: 150px;
       text-align: left;
       top: 178px;
-      left: 720px;
+      left: 820px;
     }
     .gwd-p-exob {
       position: absolute;
@@ -228,8 +228,8 @@
       border-width: 0px;
       width: 150px;
       top: 16px;
-      left: 674px;
       height: 440px;
+      left: 774px;
     }
     .gwd-span-o0yi {
       position: absolute;
@@ -293,13 +293,13 @@
     .gwd-div-2238 {
       position: absolute;
       height: 440px;
-      left: 1015px;
       top: 16px;
       width: 150px;
+      left: 1100px;
     }
     .gwd-p-jxzy {
-      left: 1063px;
       top: 178px;
+      left: 1150px;
     }
     .gwd-input-rq4f {
       left: 150px;
@@ -318,6 +318,9 @@
       background-color: rgb(218, 206, 74);
       height: 100px;
       font-size: 14px;
+    }
+    .gwd-p-woyy {
+      left: 985px;
     }
   </style>
   <script src="https://cdn.steemjs.com/lib/latest/steem.min.js"></script>
@@ -408,20 +411,25 @@
             udate = new Date(utime);
             udatenum = udate.getTime();
             if (udatenum >= sdatenum1 && udatenum < sdatenum2) {
-              document.getElementById("upvote_date").style.fontSize = "x-small";
+              document.getElementById("upvote_date").style.fontSize = "small";
               document.getElementById('upvote_date').innerHTML = document.getElementById('upvote_date').innerHTML + utime + "<br />";
 
-              document.getElementById("post_from").style.fontSize = "x-small";
+              document.getElementById("post_from").style.fontSize = "small";
               document.getElementById('post_from').innerHTML = document.getElementById('post_from').innerHTML + ap[0] + "<br />";
 
-              document.getElementById("post_content").style.fontSize = "x-small";
-              document.getElementById('post_content').innerHTML = document.getElementById('post_content').innerHTML + ap[1] + "<br />";
+              document.getElementById("post_content").style.fontSize = "small";
+              
+              ref_text="href='https://steemit.com/@"+ap[0]+"/" +ap[1]
+              link_ref = "<a " + "href='https://steemit.com/@" + ap[0]+"/" +ap[1]+"'>link</a>";
+              document.getElementById('post_content').innerHTML= document.getElementById('post_content').innerHTML +link_ref+"--------"+ap[1]+ "<br />";
+              
+              
               steem.api.getContent(ap[0], ap[1], function(err, result) {
 
                 ctime = result.created;
 
 
-                document.getElementById("post_date").style.fontSize = "x-small";
+                document.getElementById("post_date").style.fontSize = "small";
                 document.getElementById('post_date').innerHTML = document.getElementById('post_date').innerHTML + ctime + "<br />";
 
               });
@@ -458,7 +466,7 @@
         pmsec = pdate.getTime();
 
         diff = ((umsec - pmsec) / 86400000);
-        document.getElementById("diff").style.fontSize = "x-small";
+        document.getElementById("diff").style.fontSize = "small";
         document.getElementById('diff').innerHTML = document.getElementById('diff').innerHTML + diff.toFixed(2) + "<br />";
         if (diff >= 0 && diff < 1) {
           d1++;
@@ -545,7 +553,7 @@
   </p>
   <p class="gwd-p-9kqp" id="p_date_label">Post Date</p>
   <p class="gwd-p-exob gwd-p-jxzy" id="diff_label">Upvoted after (days)</p>
-  <p class="gwd-p-exob" id="u_date_label">Upvote Date</p>
+  <p class="gwd-p-exob gwd-p-woyy" id="u_date_label">Upvote Date</p>
   <input id="analyse_but" type="button" value=" Start Analysis " class="gwd-input-ib25" onclick="search()">
   <input id="calculate_but" type="button" value=" Calculate " class="gwd-input-ib25 gwd-input-rq4f" onclick="calculate()">
   <p class="gwd-span-jbfh gwd-p-r1du" id="l3_day">2 to 3 days upvotes</p>
