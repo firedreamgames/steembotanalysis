@@ -50,3 +50,7 @@ Task requests will be opened for :
 * User friendly interphase
 * Array calculations with asyncronous functions in the loop ( API calls )
 * Much efficient algortihm for weekly and monthly analysis
+
+#### Changes 18.01.2018
+Clickable hyperlinks to the post div. is added. Now user can click the link to reach the post.
+
