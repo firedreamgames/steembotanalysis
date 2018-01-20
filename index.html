@@ -335,7 +335,12 @@
   <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.min.js"></script>
 
   <script language="javascript">
-    // TODO: This should be in a different file, served by a simple http server (ie. Node's http-server)
+    // TODO: This should be in a different file (same with the css), served by a simple http server (ie. Node's http-server)
+    
+    // Accounts holds all of the retrieves accounts. ie:
+    // username: {
+    //   votes: [votedata...]
+    // }
     var accounts = {};
 
     var voter_valid = false;
@@ -343,16 +348,6 @@
     steem.api.setOptions({
       url: 'https://api.steemit.com'
     });
-
-    var upvote_time = new Array();
-    var aut = new Array();
-    var perm = new Array();
-    var auper = new Array();
-    var cr_time = new Array();
-    var timediff = new Array();
-    var auper_len = 0;
-    var i = 0;
-    var utime = 0;
 
     function showfield(name) {
       if (name == 'other') {
@@ -442,6 +437,7 @@
             return (accountVoteDateUnix >= selectedDateUnix && accountVoteDateUnix <= nextDateUnix);
           });
 
+          // Here we will wait for all promises to resolve before building our table and calculating
           Promise.map(accountVotesFilteredForSelectedDate, function(filteredVote) {
             var dfd = jQuery.Deferred();
             var authorPerm = filteredVote.authorperm.split("/");
@@ -454,7 +450,7 @@
                 filteredVote.accountName = authorPerm[0];
                 filteredVote.perm = authorPerm[1];
                 filteredVote.postDate = result.created;
-                filteredVote.content = result;
+                filteredVote.content = result; // Keep track of the whole object, in case we need it later
 
                 // keep track of all votes in a single object per user
                 if (!accounts[authorPerm[0]]) {
@@ -475,14 +471,15 @@
             $('#analyse_but').attr('disabled', false);
             $('.loadingGif').hide();
 
-            buildPostTable();
-            calculate();
+            buildPostTable(); // Build table
+            calculate(); // Parse values
           });
 
         });
       }
     }
 
+    // TODO: This could be reworked with MomentJS
     function calculate() {
       var d1 = 0;
       var d2 = 0;
