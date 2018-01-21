@@ -316,38 +316,35 @@
       top: 1px;
       background-image: none;
       background-color: rgb(218, 206, 74);
-      height: 70px;
+      height: 100px;
       font-size: 14px;
     }
     .gwd-p-woyy {
       left: 985px;
     }
-    .loadingGif {
-      transform: translate3d(960px, 28px, 0px);
-      display: none;
-    }
   </style>
-
   <script src="https://cdn.steemjs.com/lib/latest/steem.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.20.1/moment.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.0/jquery.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/bluebird/3.5.0/bluebird.min.js"></script>
-
-  <script language="javascript">
-    // TODO: This should be in a different file (same with the css), served by a simple http server (ie. Node's http-server)
-    
-    // Accounts holds all of the retrieved account votes. ie:
-    // username: {
-    //   votes: [votedata...]
-    // }
-    var accounts = {};
-
-    var voter_valid = false;
-
+  <script language="JavaScript">
     steem.api.setOptions({
       url: 'https://api.steemit.com'
     });
+
+    window.upvote_time = new Array();
+    window.aut = new Array();
+    window.perm = new Array();
+    window.auper = new Array();
+    window.cr_time = new Array();
+    window.timediff = new Array();
+    window.auper_len = 0;
+    window.i = 0;
+    window.utime = 0;
+    var voter_valid = 0;
+
+
+
+
+
+
 
     function showfield(name) {
       if (name == 'other') {
@@ -355,138 +352,100 @@
         document.getElementById('bot_def').addEventListener("focusout", focusout_func);
       } else {
         document.getElementById('Bot_Name_Input').innerHTML = name;
+
       }
     }
+
+
 
     function focusout_func() {
       document.getElementById('Bot_Name_Input').innerHTML = document.getElementById('bot_def').value
     }
 
-    var clearSearchFields = function() {
-      $('#upvote_date, #post_from, #post_content, #post_date, #Qty_Vote_1, #Qty_Vote_2, #Qty_Vote_3, #Qty_Vote_4, #Qty_Vote_5, #Qty_Vote_6, #Qty_Vote_7, #diff').html('');
-    }
 
-    var checkVoterName = function() {
-      var voter = $('#Bot_Name_Input').html();
-      if (!voter) {
+
+
+
+
+
+    function search()
+
+     {
+      document.getElementById('upvote_date').innerHTML = "";
+      document.getElementById('post_from').innerHTML = "";
+      document.getElementById('post_content').innerHTML = "";
+      document.getElementById('post_date').innerHTML = "";
+      document.getElementById('Qty_Vote_1').innerHTML = "";
+      document.getElementById('Qty_Vote_2').innerHTML = "";
+      document.getElementById('Qty_Vote_3').innerHTML = "";
+      document.getElementById('Qty_Vote_4').innerHTML = "";
+      document.getElementById('Qty_Vote_5').innerHTML = "";
+      document.getElementById('Qty_Vote_6').innerHTML = "";
+      document.getElementById('Qty_Vote_7').innerHTML = "";
+      document.getElementById('diff').innerHTML = "";
+
+      voter = document.getElementById('Bot_Name_Input').innerHTML;
+      if (voter == "") {
         window.alert("Please enter a bot name   " + voter);
-        return false;        
       } else {
-        return true;
+        window.alert("Voter defined   " + document.getElementById('Bot_Name_Input').innerHTML);
+        voter_valid = 1;
       }
-    }
 
-    var retrieveAllVotes = function() {
-      return _.flatten(_.map(accounts, function(account) {
-        return account.votes;
-      }));
-    }
+      bot = document.getElementById('Bot_Name_Input').innerHTML;
 
-    var buildPostTable = function() {
-      var accountVotes = retrieveAllVotes();
+      if (voter_valid == 1) {
+        Sday = document.getElementById('Sday').value;
+        sdate = new Date(Sday);
+        sdatenum1 = sdate.getTime();
+        sdatenum2 = sdatenum1 + 86400000;
 
-      // Build our strings first, do not redraw iterating. Kills performance.
-      var upvoteDateStr = "";
-      var postFrom = "";
-      var postContent = "";
-      var postDate = "";
 
-      accountVotes.forEach(function(accountVote) {
-        upvoteDateStr += accountVote.time + "<br />";
-        postFrom += accountVote.accountName + "<br />";
-
-        var ref_text = "href='https://steemit.com/@" + accountVote.accountName + "/" + accountVote.perm
-        var link_ref = "<a " + "href='https://steemit.com/@" + accountVote.accountName + "/" + accountVote.perm + "'>link</a>";
-
-        postContent += link_ref + "--------" + accountVote.perm + "<br />";
-        postDate += accountVote.postDate + "<br />";
-      });
-
-      document.getElementById("upvote_date").style.fontSize = "small";
-      document.getElementById('upvote_date').innerHTML = upvoteDateStr;
-
-      document.getElementById("post_from").style.fontSize = "small";
-      document.getElementById('post_from').innerHTML = postFrom;
-
-      document.getElementById("post_content").style.fontSize = "small";
-      document.getElementById('post_content').innerHTML = postContent;
-
-      document.getElementById("post_date").style.fontSize = "small";
-      document.getElementById('post_date').innerHTML = postDate;
-    }
-
-    function search() {
-      clearSearchFields();
-
-      if (checkVoterName()) {
-
-        // Reset account votes hash on a new search
-        accounts = {};
-
-        // Disable while we search, to prevent double clicking
-        // Show a spinner
-        $('#analyse_but').attr('disabled', true);
-        $('.loadingGif').show();
-
-        voter = document.getElementById('Bot_Name_Input').innerHTML;
-        bot = voter; // Why twice?
-
-        var selectedDate = document.getElementById('Sday').value;
-        var selectedDateUnix = moment(selectedDate, "YYYY-MM-DD").valueOf();
-        var nextDateUnix = moment(selectedDateUnix).add(1, 'days').valueOf();
 
         steem.api.getAccountVotes(bot, function(err, result) {
-          var accountVotes = result;
+          auper = result;
+          auper_len = auper.length;
+          for (x = 0; x < auper_len; x++) {
+            ap = auper[x].authorperm.split("/");
+            utime = auper[x].time;
+            udate = new Date(utime);
+            udatenum = udate.getTime();
+            if (udatenum >= sdatenum1 && udatenum < sdatenum2) {
+              document.getElementById("upvote_date").style.fontSize = "small";
+              document.getElementById('upvote_date').innerHTML = document.getElementById('upvote_date').innerHTML + utime + "<br />";
 
-          // Filter and return all of the account votes between the selected date and the next
-          var accountVotesFilteredForSelectedDate = _.filter(accountVotes, function(accountVote) {
-            var accountVoteDateUnix = moment(accountVote.time).valueOf();
-            return (accountVoteDateUnix >= selectedDateUnix && accountVoteDateUnix <= nextDateUnix);
-          });
+              document.getElementById("post_from").style.fontSize = "small";
+              document.getElementById('post_from').innerHTML = document.getElementById('post_from').innerHTML + ap[0] + "<br />";
 
-          // Here we will wait for all promises to resolve before building our table and calculating
-          Promise.map(accountVotesFilteredForSelectedDate, function(filteredVote) {
-            var dfd = jQuery.Deferred();
-            var authorPerm = filteredVote.authorperm.split("/");
+              document.getElementById("post_content").style.fontSize = "small";
+              
+              ref_text="href='https://steemit.com/@"+ap[0]+"/" +ap[1]
+              link_ref = "<a " + "href='https://steemit.com/@" + ap[0]+"/" +ap[1]+"'>link</a>";
+              document.getElementById('post_content').innerHTML= document.getElementById('post_content').innerHTML +link_ref+"--------"+ap[1]+ "<br />";
+              
+              
+              steem.api.getContent(ap[0], ap[1], function(err, result) {
 
-            steem.api.getContent(authorPerm[0], authorPerm[1], function(err, result) {
-              if (err) {
-                dfd.reject(error);
-              } else {
+                ctime = result.created;
 
-                filteredVote.accountName = authorPerm[0];
-                filteredVote.perm = authorPerm[1];
-                filteredVote.postDate = result.created;
-                filteredVote.content = result; // Keep track of the whole object, in case we need it later
 
-                // keep track of all votes in a single object per user
-                if (!accounts[authorPerm[0]]) {
-                  accounts[authorPerm[0]] = {
-                    votes: [filteredVote]
-                  }                  
-                } else {
-                  accounts[authorPerm[0]].votes.push(filteredVote);
-                }
+                document.getElementById("post_date").style.fontSize = "small";
+                document.getElementById('post_date').innerHTML = document.getElementById('post_date').innerHTML + ctime + "<br />";
 
-                dfd.resolve(result);
-              }
-            });
+              });
+            }
 
-            return dfd.promise();            
-          }).then(function(allPromisesDone) {
-            //Reenable and hide spinner
-            $('#analyse_but').attr('disabled', false);
-            $('.loadingGif').hide();
 
-            buildPostTable(); // Build table
-            calculate(); // Parse values
-          });
+
+          }
+
 
         });
+
+
       }
     }
 
-    // TODO: This could be reworked with MomentJS
     function calculate() {
       var d1 = 0;
       var d2 = 0;
@@ -596,7 +555,7 @@
   <p class="gwd-p-exob gwd-p-jxzy" id="diff_label">Upvoted after (days)</p>
   <p class="gwd-p-exob gwd-p-woyy" id="u_date_label">Upvote Date</p>
   <input id="analyse_but" type="button" value=" Start Analysis " class="gwd-input-ib25" onclick="search()">
-  <div class="loadingGif"><img src="https://cdnjs.cloudflare.com/ajax/libs/timelinejs/2.25/css/loading.gif" alt="Loading" width="25"></div>
+  <input id="calculate_but" type="button" value=" Calculate " class="gwd-input-ib25 gwd-input-rq4f" onclick="calculate()">
   <p class="gwd-span-jbfh gwd-p-r1du" id="l3_day">2 to 3 days upvotes</p>
   <p class="gwd-span-jbfh gwd-p-lo1t" id="l1_day">0 to 1 day upvotes</p>
   <p class="gwd-span-jbfh gwd-p-1anj gwd-p-dm4s gwd-p-zhuc" id="l5_day">4 to 5 days upvotes</p>
@@ -607,8 +566,11 @@
   <p class="gwd-p-azgy">&nbsp; &nbsp;How to Use :<br>
     &nbsp; &nbsp;1- Select bot or select "OTHER" to enter a bot name<br>
     &nbsp; &nbsp;2- Select analysis date<br>
-    &nbsp; &nbsp;3- Press "START ANALYSIS" to get results<br>
-  <br>
+    &nbsp; &nbsp;3- Press "START ANALYSIS" to get data<br>
+    &nbsp; &nbsp;4- Wait until HTML field is full with data<br>
+    &nbsp; &nbsp;5- Press "CALCULATE" to see the result<br>
+    <br>
+    
   </p>
 </body>
 
