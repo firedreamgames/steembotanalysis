@@ -337,7 +337,7 @@
   <script language="javascript">
     // TODO: This should be in a different file (same with the css), served by a simple http server (ie. Node's http-server)
     
-    // Accounts holds all of the retrieves accounts. ie:
+    // Accounts holds all of the retrieved account votes. ie:
     // username: {
     //   votes: [votedata...]
     // }
@@ -376,10 +376,14 @@
       }
     }
 
-    var buildPostTable = function() {
-      var accountVotes = _.flatten(_.map(accounts, function(account) {
+    var retrieveAllVotes = function() {
+      return _.flatten(_.map(accounts, function(account) {
         return account.votes;
       }));
+    }
+
+    var buildPostTable = function() {
+      var accountVotes = retrieveAllVotes();
 
       // Build our strings first, do not redraw iterating. Kills performance.
       var upvoteDateStr = "";
@@ -415,6 +419,9 @@
       clearSearchFields();
 
       if (checkVoterName()) {
+
+        // Reset account votes hash on a new search
+        accounts = {};
 
         // Disable while we search, to prevent double clicking
         // Show a spinner
