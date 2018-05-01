@@ -66,8 +66,8 @@
       position: absolute;
       width: 115px;
       height: 26px;
-      left: 807px;
       top: 9px;
+      left: 806px;
     }
     .gwd-div-1426 {
       position: absolute;
@@ -209,7 +209,7 @@
       font-size: 20px;
       text-align: center;
       height: 30px;
-      transform: translate3d(802px, 55px, 0px);
+      transform: translate3d(517px, 51px, 0px);
     }
     .gwd-div-1jgx {
       left: 263px;
@@ -312,12 +312,12 @@
       position: absolute;
       width: 342.913px;
       text-align: left;
-      left: 1026px;
-      top: 1px;
       background-image: none;
       background-color: rgb(218, 206, 74);
-      height: 70px;
       font-size: 14px;
+      height: 90px;
+      left: 965px;
+      top: 10px;
     }
     .gwd-p-woyy {
       left: 785px;
@@ -358,6 +358,10 @@
     .gwd-p-119x {
       left: 1060px;
     }
+    .gwd-form-d3aa {
+      left: 0px;
+      top: 0px;
+    }
   </style>
   <script src="https://cdn.steemjs.com/lib/latest/steem.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.min.js"></script>
@@ -380,75 +384,39 @@
 
     function calc_global() {
       steem.api.getDynamicGlobalProperties(function(err, result) {
-        console.log(result);
-
         steem.api.getFeedHistory(function(err, result2) {
-          console.log(err, result2);
-
+          //console.log(err, result2);
           steem.api.getRewardFund('post', function(err, result3) {
-            console.log(err, result3);
+            //console.log(err, result3);
             var reward_balance = parseFloat(result3.reward_balance.split(" ")[0]);
             var recent_claims = parseFloat(result3.recent_claims);
             var steem_reward_per_vest = (reward_balance / recent_claims);
-
-
-
-
             calculate_steempov(result, result2, steem_reward_per_vest);
 
           });
         });
-
       });
-
-
     }
 
     function calculate_steempov(globals, feed_price, rpv) {
       total_vesting_shares = globals.total_vesting_shares;
       total_vesting_fund_steem = globals.total_vesting_fund_steem;
       feed = feed_price;
-      console.log(globals);
-      console.log(rpv);
       steem.api.getAccounts([voter], function(err, response) {
-
         vesting_shares = parseFloat(response[0].vesting_shares.split(' ')[0]);
         delegated_vesting_shares = parseFloat(response[0].delegated_vesting_shares.split(' ')[0]);
         received_vesting_shares = parseFloat(response[0].received_vesting_shares.split(' ')[0]);
         steem_power = (vesting_shares + received_vesting_shares - delegated_vesting_shares);
-        console.log(vesting_shares, delegated_vesting_shares, received_vesting_shares);
-
-
-        //steem_power = steem.formatter.vestToSteem(vesting_shares, total_vesting_shares, total_vesting_fund_steem);
-        //delegated_steem_power = steem.formatter.vestToSteem(received_vesting_shares - delegated_vesting_shares + ' VESTS', total_vesting_shares, total_vesting_fund_steem);
         var feed_arr = feed_price.current_median_history.base;
         feed = feed_arr.split(" ")[0];
         max_sbd = (rpv * steem_power * 0.2) * feed * 100000;
-
-
       });
-
-
-
-
-
-
-
     }
 
 
 
 
-     //document.getElementById("vesting_shares").innerHTML = result.total_vesting_shares;
-     //document.getElementById("vesting_fund").innerHTML = result.total_vesting_fund_steem;
 
-
-     // TODO: This should be in a different file (same with the css), served by a simple http server (ie. Node's http-server)
-
-     // Accounts holds all of the retrieved account votes. ie:
-     // username: {
-     //   votes: [votedata...]
-     // }
     var accounts = {};
     var voter_valid = false;
     steem.api.setOptions({
@@ -534,7 +502,10 @@
           bot = voter; // Why twice?
           var selectedDate = document.getElementById('Sday').value;
           var selectedDateUnix = moment(selectedDate, "YYYY-MM-DD").valueOf();
-          var nextDateUnix = moment(selectedDateUnix).add(1, 'days').valueOf();
+          // date range addition
+          var nextDate = document.getElementById('Dday').value;
+          var nextDateUnix = moment(nextDate, "YYYY-MM-DD").valueOf();
+          //var nextDateUnix = moment(selectedDateUnix).add(1, 'days').valueOf(); (old script)
           steem.api.getAccountVotes(bot, function(err, result) {
             var accountVotes = result;
             // Filter and return all of the account votes between the selected date and the next
@@ -552,22 +523,6 @@
                 } else {
 
 
-                  //for (let i = 0; i < filteredVote.weight.length; i++) {
-                  // var all_voters = filteredVote.weight[i];
-
-
-                  //if (voter == all_voters.voter) {
-                  //document.getElementById('vote_Weight').innerHTML = document.getElementById('vote_Weight').innerHTML + " % " + (all_voters.percent / 100) + "<br />";
-                  //console.log(all_voters.percent / 100);
-
-                  //}
-
-
-
-
-
-
-                  //}
 
 
 
@@ -651,6 +606,17 @@
       document.getElementById('Qty_Vote_6').innerHTML = d6;
       document.getElementById('Qty_Vote_7').innerHTML = d7;
     }
+
+    function checkdate() {
+      if (document.getElementById('Dday').value <= document.getElementById('Sday').value) {
+        window.alert("End day can not be earlier than start date")
+      }
+      if (document.getElementById('Dday').value > document.getElementById('Sday').value) {
+        search();
+      }
+
+
+    }
   </script>
 </head>
 
@@ -675,9 +641,10 @@
     <div class="gwd-div-1dz9" id="Bot_Name_Input">promobot</div>
   </div>
   <div class="gwd-div-hyfy" id="SDate">
-    <form action="/action_page.php">
-      Analysis Date:
-      <input type="date" id="Sday" name="Sday" value="2018-01-01">
+    <form action="/action_page.php" class="gwd-form-d3aa">
+      Start Date:
+      <input type="date" id="Sday" name="Sday" value="<?php echo $today; ?>">End Date:
+      <input type="date" id="Dday" name="Dday" value="<?php echo $today; ?>">
     </form>
   </div>
   <div class="gwd-div-1426 gwd-div-mtwt gwd-div-1jgx" id="Qty_Vote_1"></div>
@@ -707,7 +674,7 @@
   <p class="gwd-p-exob gwd-p-jxzy gwd-p-1w2z gwd-p-119x" id="diff_label_1">Vote Weight</p>
   <p class="gwd-p-exob gwd-p-jxzy gwd-p-1w2z gwd-p-ayz0" id="diff_label_2">Vote SBD</p>
   <p class="gwd-p-exob gwd-p-woyy" id="u_date_label">Upvote Date</p>
-  <input id="analyse_but" type="button" value=" Start Analysis " class="gwd-input-ib25" onclick="search()">
+  <input id="analyse_but" type="button" value=" Start Analysis " class="gwd-input-ib25" onclick="checkdate()">
   <div class="loadingGif">
     <img src="https://cdnjs.cloudflare.com/ajax/libs/timelinejs/2.25/css/loading.gif" alt="Loading" width="25">
   </div>
@@ -720,8 +687,9 @@
   <p class="gwd-span-jbfh gwd-p-7g3y" id="l2_day">1 to 2 days upvotes</p>
   <p class="gwd-p-azgy">&nbsp; &nbsp;How to Use :<br>
     &nbsp; &nbsp;1- Select bot or select "OTHER" to enter a bot name<br>
-    &nbsp; &nbsp;2- Select analysis date<br>
-    &nbsp; &nbsp;3- Press "START ANALYSIS" to get results<br>
+    &nbsp; &nbsp;2- Select analysis START date<br>
+    &nbsp; &nbsp;3- Select analysis END date<br>
+    &nbsp; &nbsp;4- Press "START ANALYSIS" to get results<br>
     <br>
     
   </p>
